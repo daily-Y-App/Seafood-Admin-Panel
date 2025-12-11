@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#DC2626">
+    <title>Admin - Seafood Manager</title>
+    <style>
+        /* CSS Styles (အတိအကျ မူရင်းအတိုင်း) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+            min-height: 100vh;
+        }
+
+        /* LOCK SCREEN */
+        .lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 2rem;
+        }
+
+        .lock-screen.hidden {
+            display: none !important;
+        }
+
+        .lock-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lock-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .lock-subtitle {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 2rem;
+        }
+
+        .lock-input {
+            width: 100%;
+            max-width: 350px;
+            padding: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 15px;
+            font-size: 1.3rem;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            text-align: center;
+            letter-spacing: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+
+        .lock-input:focus {
+            outline: none;
+            border-color: white;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .lock-btn {
+            width: 100%;
+            max-width: 350px;
+            padding: 1rem;
+            background: white;
+            color: #DC2626;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .lock-error {
+            color: #FCA5A5;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+            font-weight: 600;
+        }
+
+        /* MAIN APP */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .lock-btn-header {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #DC2626;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #64748B;
+            margin-top: 0.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            background: white;
+            color: #DC2626;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #DC2626;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #1E293B;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input, select {
+            padding: 0.8rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .form-input:focus, select:focus {
+            outline: none;
+            border-color: #DC2626;
+        }
+
+        .btn {
+            padding: 0.9rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-danger {
+            background: #EF4444;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            width: auto;
+        }
+
+        .success-msg {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+            font-weight: 600;
+        }
+
+        .order-item {
+            background: #F8FAFC;
+            border: 2px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .order-id {
+            font-weight: 700;
+            color: #DC2626;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-cleaning { background: #FEF3C7; color: #92400E; }
+        .status-packed { background: #DBEAFE; color: #1E40AF; }
+        .status-delivering { background: #E0E7FF; color: #4338CA; }
+        .status-completed { background: #D1FAE5; color: #065F46; }
+
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .order-actions select {
+            flex: 1;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #64748B;
+        }
+    </style>
+</head>
+<body>
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-title">Admin Panel</div>
+        <div class="lock-subtitle">Enter PIN:Admin Yarzar</div>
+        <input 
+            type="password" 
+            class="lock-input" 
+            id="lockPin" 
+            placeholder="00000000"
+            maxlength="8"
+            autofocus
+        >
+        <button class="lock-btn" onclick="checkPin()">Unlock</button>
+        <div class="lock-error" id="lockError">🔑😬❌ Wrong PIN</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <div class="header-title">👨‍💼 Admin Panel</div>
+            </div>
+            <button class="lock-btn-header" onclick="logout()">🔒 Lock</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-number" id="totalOrders">0</div>
+                <div class="stat-label">📦 Total Orders</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="activeOrders">0</div>
+                <div class="stat-label">🔥 Active</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="completed">0</div>
+                <div class="stat-label">✅ Completed</div>
+            </div>
+        </div>
+
+        <div class="success-msg" id="successMsg"></div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('orders')">📦 Orders</button>
+            <button class="tab" onclick="switchTab('schedule')">⏰ Schedule</button>
+            <button class="tab" onclick="switchTab('targets')">🎯 Targets</button>
+        </div>
+
+        <div id="orders" class="tab-content active">
+            <div class="card">
+                <div class="card-title">➕ Create New Order</div>
+                <div class="input-grid">
+                    <div class="form-group">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" class="form-input" id="customerName" placeholder="Name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Item Type</label>
+                        <select class="form-input" id="itemType">
+                            <option value="shrimp">🦐ပုဇွန်</option>
+                            <option value="squid">🦑 ကင်းမွန်း</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-input" id="quantity" value="10" min="1">
+                    </div>
+                </div>
+                <button class="btn" onclick="createOrder()">📝 Create Order</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📦 All Orders (Live Data)</div>
+                <div id="ordersContainer" class="loading">Loading orders...</div>
+            </div>
+        </div>
+
+        <div id="schedule" class="tab-content">
+            <div class="card">
+                <div class="card-title">⏰ Work Schedule</div>
+                <div class="input-grid">
+                    <div class="form-group">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" class="form-input" id="startTime" value="08:00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Time</label>
+                        <input type="time" class="form-input" id="endTime" value="17:00">
+                    </div>
+                </div>
+                <button class="btn" onclick="updateSchedule()">💾 Save Schedule</button>
+            </div>
+        </div>
+
+        <div id="targets" class="tab-content">
+            <div class="card">
+                <div class="card-title">🎯 Daily Targets</div>
+                <div class="input-grid">
+                    <div class="form-group">
+                        <label class="form-label">🦐 ပုဇွန်</label>
+                        <input type="number" class="form-input" id="shrimpTarget" value="100" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">🦑 ကင်းမွန်</label>
+                        <input type="number" class="form-input" id="squidTarget" value="50" min="0">
+                    </div>
+                </div>
+                <button class="btn" onclick="updateTargets()">💾 Save Targets</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase Functions (v9 modular)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getFirestore, collection, query, where, onSnapshot, getDocs, doc, addDoc, deleteDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+        
+        // Firebase Configuration (User APK တွင် ပေးခဲ့သော Config အတူတူပင်)
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4ncNhlETbAgB5uFbEiXRON-3vhfneEV0",
+            authDomain: "seafood-oder.firebaseapp.com",
+            databaseURL: "https://seafood-oder-default-rtdb.firebaseio.com",
+            projectId: "seafood-oder",
+            storageBucket: "seafood-oder.firebasestorage.app",
+            messagingSenderId: "428949391732",
+            appId: "1:428949391732:web:908e851d89aff17365c421",
+            measurementId: "G-GNP9K51MCY"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ========== LOCK SYSTEM ==========
+        const ADMIN_PIN = '31707848'; // မူရင်း PIN
+
+        function checkPin() {
+            const pin = document.getElementById('lockPin').value;
+            if (pin === ADMIN_PIN) {
+                document.getElementById('lockScreen').classList.add('hidden');
+                // PIN မှန်မှ Data တွေ စတင်ဆွဲယူရန်
+                loadLiveOrders();
+                loadLiveSchedule();
+                loadLiveTargets();
+            } else {
+                document.getElementById('lockError').style.display = 'block';
+                document.getElementById('lockPin').value = '';
+                setTimeout(() => {
+                    document.getElementById('lockError').style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        function logout() {
+            document.getElementById('lockScreen').classList.remove('hidden');
+            document.getElementById('lockPin').value = '';
+            document.getElementById('lockPin').focus();
+        }
+
+        document.getElementById('lockPin').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkPin();
+        });
+
+        // ========== UTILITY ==========
+        function switchTab(name) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(name).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showSuccess(msg) {
+            const el = document.getElementById('successMsg');
+            el.textContent = '✅ ' + msg;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 2000);
+        }
+
+        // ========== ORDERS (CRUD) ==========
+        let globalOrders = [];
+
+        async function createOrder() {
+            const name = document.getElementById('customerName').value.trim();
+            const item = document.getElementById('itemType').value;
+            const qty = parseInt(document.getElementById('quantity').value);
+
+            if (!name || qty <= 0 || isNaN(qty)) {
+                alert('Customer Name ဖြည့်ပါ သို့မဟုတ် Quantity မှန်ကန်စွာ ထည့်ပါ။');
+                return;
+            }
+
+            const newOrder = {
+                customer: name,
+                item: item,
+                quantity: qty,
+                status: 'cleaning', // စတင်ထည့်သွင်းချိန်တွင် cleaning အနေအထား
+                createdAt: new Date() // Firestore Timestamp အတွက် Date Object ကို ထည့်သွင်း
+            };
+
+            try {
+                await addDoc(collection(db, "orders"), newOrder);
+                document.getElementById('customerName').value = '';
+                document.getElementById('quantity').value = '10';
+                showSuccess('Order created and saved to Firebase!');
+            } catch (e) {
+                alert("Error creating order. Check Firestore Rules!");
+                console.error("Error adding document: ", e);
+            }
+        }
+
+        function loadLiveOrders() {
+            const ordersRef = collection(db, "orders");
+            // Orders အားလုံးကို Realtime ရယူရန်
+            onSnapshot(ordersRef, (snapshot) => {
+                globalOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderOrders();
+                updateStats(); 
+            }, (error) => {
+                console.error("Error loading orders: ", error);
+                document.getElementById('ordersContainer').innerHTML = '<div class="loading">Error loading data. Check console and security rules.</div>';
+            });
+        }
+
+        function renderOrders() {
+            const container = document.getElementById('ordersContainer');
+            if (globalOrders.length === 0) {
+                container.innerHTML = '<div class="loading">No orders in database.</div>';
+                return;
+            }
+
+            let html = '';
+            // Newest first
+            globalOrders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)); 
+
+
+            globalOrders.forEach(order => {
+                const itemEmoji = order.item === 'shrimp' ? '🦐' : '🦑';
+                const itemName = order.item === 'shrimp' ? 'ပုဇွန်' : 'ကင်းမွန်';
+
+                html += `
+                    <div class="order-item">
+                        <div class="order-header">
+                            <div class="order-id">#${order.id.substring(0, 8)}...</div>
+                            <span class="status-badge status-${order.status}">${order.status}</span>
+                        </div>
+                        <div style="margin-bottom: 0.8rem;">
+                            <strong>${order.customer}</strong><br>
+                            ${itemEmoji} ${itemName} × ${order.quantity}
+                        </div>
+                        <div class="order-actions">
+                            <select onchange="updateStatus('${order.id}', this.value)">
+                                <option value="cleaning" ${order.status === 'cleaning' ? 'selected' : ''}>Cleaning</option>
+                                <option value="packed" ${order.status === 'packed' ? 'selected' : ''}>Packed</option>
+                                <option value="delivering" ${order.status === 'delivering' ? 'selected' : ''}>Delivering</option>
+                                <option value="completed" ${order.status === 'completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                            <button class="btn btn-danger" onclick="deleteOrder('${order.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        async function updateStatus(id, status) {
+            try {
+                await updateDoc(doc(db, "orders", id), { status: status });
+                showSuccess('Status updated in Firebase!');
+            } catch (e) {
+                alert("Error updating status. Check Firestore Rules!");
+                console.error("Error updating document: ", e);
+            }
+        }
+
+        async function deleteOrder(id) {
+            if (confirm('Delete this order?')) {
+                try {
+                    await deleteDoc(doc(db, "orders", id));
+                    showSuccess('Order deleted from Firebase!');
+                } catch (e) {
+                    alert("Error deleting order. Check Firestore Rules!");
+                    console.error("Error deleting document: ", e);
+                }
+            }
+        }
+
+        // ========== SCHEDULE (UPDATE) ==========
+        async function updateSchedule() {
+            const start = document.getElementById('startTime').value;
+            const end = document.getElementById('endTime').value;
+            
+            try {
+                // schedule Collection ထဲက 'current' document ကို update သို့မဟုတ် အသစ်ထည့်
+                await setDoc(doc(db, "schedule", "current"), { start, end });
+                showSuccess('Schedule saved to Firebase!');
+            } catch (e) {
+                alert("Error saving schedule. Check Firestore Rules!");
+                console.error("Error setting document: ", e);
+            }
+        }
+        
+        function loadLiveSchedule() {
+            // Live schedule ကို စတင်ဆွဲယူပြီး UI ကို update လုပ်
+            onSnapshot(doc(db, "schedule", "current"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const schedule = docSnap.data();
+                    document.getElementById('startTime').value = schedule.start || '08:00';
+                    document.getElementById('endTime').value = schedule.end || '17:00';
+                }
+            });
+        }
+
+        // ========== TARGETS (UPDATE) ==========
+        async function updateTargets() {
+            const shrimp = parseInt(document.getElementById('shrimpTarget').value);
+            const squid = parseInt(document.getElementById('squidTarget').value);
+
+            if (isNaN(shrimp) || isNaN(squid) || shrimp < 0 || squid < 0) {
+                alert('Targets must be valid numbers.');
+                return;
+            }
+            
+            try {
+                // targets Collection ထဲက 'daily' document ကို update သို့မဟုတ် အသစ်ထည့်
+                await setDoc(doc(db, "targets", "daily"), { shrimp, squid });
+                showSuccess('Targets saved to Firebase!');
+            } catch (e) {
+                alert("Error saving targets. Check Firestore Rules!");
+                console.error("Error setting document: ", e);
+            }
+        }
+        
+        function loadLiveTargets() {
+            // Live targets ကို စတင်ဆွဲယူပြီး UI ကို update လုပ်
+             onSnapshot(doc(db, "targets", "daily"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const targets = docSnap.data();
+                    document.getElementById('shrimpTarget').value = targets.shrimp || 100;
+                    document.getElementById('squidTarget').value = targets.squid || 50;
+                }
+            });
+        }
+
+
+        // ========== STATS (ORDERS COUNT) ==========
+        function updateStats() {
+            const activeOrders = globalOrders.filter(o => o.status !== 'completed');
+            const completedOrders = globalOrders.filter(o => o.status === 'completed');
+
+            document.getElementById('totalOrders').textContent = globalOrders.length;
+            document.getElementById('activeOrders').textContent = activeOrders.length;
+            document.getElementById('completed').textContent = completedOrders.length;
+        }
+
+
+        // Initialize - PIN မှန်မှသာ Data ဆွဲယူရန် လုပ်ဆောင်ခဲ့သောကြောင့်၊
+        // Code အားလုံးကို Global Scope သို့ ရွှေ့ရန်
+        window.checkPin = checkPin;
+        window.logout = logout;
+        window.switchTab = switchTab;
+        window.createOrder = createOrder;
+        window.updateStatus = updateStatus;
+        window.deleteOrder = deleteOrder;
+        window.updateSchedule = updateSchedule;
+        window.updateTargets = updateTargets;
+        // loadLiveOrders, loadLiveSchedule, loadLiveTargets ကို PIN မှန်မှ ခေါ်မည်
+    </script>
+</body>
+</html>
